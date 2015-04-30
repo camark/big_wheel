@@ -1,0 +1,109 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>幸运大转盘</title>
+<style type="text/css">
+body{
+    margin:0;
+    padding:0;
+  background-image:url(bg.png);
+  background-repeat:no-repeat;
+  background-attachment:fixed;
+  background-position:center;
+    -moz-background-size: cover;
+        background-size: cover;
+}
+.demo{width:1000px; height:1000px; position:relative; margin:50px auto}
+#disk{width:1000px; height:1000px; background:url(wheel.png) no-repeat}
+#start{width:476px; height:476px; background:url(point.png);position:absolute; top:262px; left:262px;}
+#start img{cursor:pointer}
+</style>
+<script src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="jQueryRotate.2.2.js"></script>
+<script type="text/javascript" src="jquery.easing.min.js"></script>
+ <script type="text/javascript">
+if(window.localStorage){
+}else{
+ alert('请换成最新版Chrome浏览器来抽奖');
+}
+
+if (localStorage.length==0) {
+    localStorage.setItem("times","0");
+}else{};
+
+$(function(){ 
+     $("#startbtn").click(function(){ 
+        lottery(); 
+    }); 
+}); 
+
+$(document).keypress(function (e){
+    switch(e.which){
+        case 13:
+            lottery()
+            break;
+    }
+});
+function lottery(){ 
+    var cj_times = localStorage.getItem("times");
+    var  times = parseInt(cj_times);
+    if  (times > 3) 
+        {alert("抽奖已经结束！");} 
+    else { 
+    //判断是否有抽奖机会
+    $.ajax({ 
+        type: 'POST', 
+        url: 'data.php', 
+        dataType: 'json', 
+        cache: false, 
+        error: function(){ 
+            alert('出错了！'); 
+            return false; 
+        }, 
+        success:function(json){ 
+            $("#startbtn").css("cursor","default"); 
+            var a = json.angle; //角度 
+            var p = json.prize; //奖项 
+            var t =  2 - times;
+            //var  tex = "<h2 id=\"sl\" style=\"text-align:center\">已经抽奖"+times+"次，还剩"+t+"次抽奖机会！</h2>";
+
+            $("#start").rotate({ 
+                duration:3000, //转动时间 
+                angle: 0, 
+                animateTo:1800+a, //转动角度 
+                easing: $.easing.easeOutSine, 
+                callback: function()
+                { 
+                    alert('恭喜,你抽中了'+p+'，还剩'+t+'抽奖机会！'); 
+                 $("#startbtn").css("cursor","pointer"); 
+                times = times + 1;
+                localStorage.setItem("times", times);
+                 //$("#sl").html(tex)
+                } 
+            }); 
+        } 
+    }); 
+} 
+};
+
+</script>
+</head>
+
+<body>
+
+
+<div id="main">
+
+   <div class="msg"> </div>
+
+   <div class="demo">
+            <div id="disk"></div>
+        <div id="start"><img src="start.png" id="startbtn" /></div>
+   </div>
+</div>
+
+
+
+</body>
+</html>
